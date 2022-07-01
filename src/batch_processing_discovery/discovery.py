@@ -6,7 +6,7 @@ from batch_processing_discovery.config import EventLogIDs
 def discover_batches(
         event_log: pd.DataFrame,
         log_ids: EventLogIDs,
-        batch_min_size: int,
+        batch_min_size: int = 2,
         max_sequential_gap: pd.Timedelta = pd.Timedelta(0)
 ) -> pd.DataFrame:
     """
@@ -39,28 +39,31 @@ def _identify_single_activity_batches(
     for _, events in event_log.groupby([log_ids.resource, log_ids.activity]):
         # Sweep line algorithm
         batch_instance = []
-        for event in events.sort_values([log_ids.start_time]).iterrows():
+        for index, event in events.sort_values([log_ids.start_time]).iterrows():
             if len(batch_instance) == 0:
                 # Add first event to the batch
-                batch_instance = [event.index]
-                batch_instance_start = event[log_ids.start_time].iloc[0]
-                batch_instance_end = event[log_ids.end_time].iloc[0]
+                batch_instance = [index]
+                batch_instance_start = event[log_ids.start_time]
+                batch_instance_end = event[log_ids.end_time]
             else:
                 # Batch detection in process
-                if (event[log_ids.enabled_time].iloc[0] <= batch_instance_start and
-                        (event[log_ids.start_time].iloc[0] - batch_instance_end) <= max_sequential_gap):
+                if (event[log_ids.enabled_time] <= batch_instance_start and
+                        (event[log_ids.start_time] - batch_instance_end) <= max_sequential_gap):
                     # Add event to batch
-                    batch_instance += [event.index]
+                    batch_instance += [index]
                     # Update batch end if necessary
-                    batch_instance_end = max(batch_instance_end, event[log_ids.end_time].iloc[0])
+                    batch_instance_end = max(batch_instance_end, event[log_ids.end_time])
                 else:
                     # Event not in batch: create current one if it fulfill the constraints
                     if len(batch_instance) >= batch_min_size:
                         batches += [batch_instance]
                     # Start another batch instance candidate with new event
-                    batch_instance = [event.index]
-                    batch_instance_start = event[log_ids.start_time].iloc[0]
-                    batch_instance_end = event[log_ids.end_time].iloc[0]
+                    batch_instance = [index]
+                    batch_instance_start = event[log_ids.start_time]
+                    batch_instance_end = event[log_ids.end_time]
+        # Process last iteration
+        if len(batch_instance) >= batch_min_size:
+            batches += [batch_instance]
     # Assign a batch ID for each group
     event_log[log_ids.batch_id] = pd.NA
     indexes, ids = [], []
@@ -71,6 +74,7 @@ def _identify_single_activity_batches(
         ids += [batch_id] * len(batch_indexes)
     # Set IDs for batched columns
     event_log.loc[indexes, log_ids.batch_id] = ids
+    event_log[log_ids.batch_id] = event_log[log_ids.batch_id].astype('Int64')
 
 
 def _identify_subprocess_batches(event_log: pd.DataFrame, log_ids: EventLogIDs, max_sequential_gap: pd.Timedelta):
