@@ -30,6 +30,16 @@ class EventLogIDs:
     batch_type: str = 'batch_instance_type'  # Type of the batch instance this activity instance belongs to, if any
 
 
+DEFAULT_CSV_IDS = EventLogIDs(case='case_id',
+                              activity='Activity',
+                              start_time='start_time',
+                              end_time='end_time',
+                              resource='Resource',
+                              enabled_time='enabled_time',
+                              batch_id='batch_instance_id',
+                              batch_type='batch_instance_type')
+
+
 @dataclass
 class BatchType:
     parallel: str = "Parallel"
