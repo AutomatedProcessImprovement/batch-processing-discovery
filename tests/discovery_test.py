@@ -1,7 +1,7 @@
 import pandas as pd
 
 from batch_processing_discovery.config import DEFAULT_CSV_IDS
-from batch_processing_discovery.discovery import _identify_single_activity_batches
+from batch_processing_discovery.discovery import _identify_single_activity_batches, _classify_batch_types
 
 
 def test__identify_single_activity_batches():
@@ -29,3 +29,15 @@ def test__identify_single_activity_batches():
     # Identify single activity batches with minimum size 2 and no gap
     _identify_single_activity_batches(event_log, DEFAULT_CSV_IDS, 4, pd.Timedelta(5, "m"))
     assert event_log[DEFAULT_CSV_IDS.batch_id].equals(event_log['expected_id_gap_size_4'])
+
+
+def test__classify_batch_types():
+    # Read input event log
+    event_log = pd.read_csv("./tests/assets/event_log_2.csv")
+    event_log[DEFAULT_CSV_IDS.enabled_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.enabled_time], utc=True)
+    event_log[DEFAULT_CSV_IDS.start_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.start_time], utc=True)
+    event_log[DEFAULT_CSV_IDS.end_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.end_time], utc=True)
+    event_log['expected_type'].fillna(pd.NA, inplace=True)
+    # Classify the types of the already identified batches
+    _classify_batch_types(event_log, DEFAULT_CSV_IDS)
+    assert event_log[DEFAULT_CSV_IDS.batch_type].equals(event_log['expected_type'])
