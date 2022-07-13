@@ -10,12 +10,16 @@ def discover_batches(
         max_sequential_gap: pd.Timedelta = pd.Timedelta(0)
 ) -> pd.DataFrame:
     """
+    Discover activity instance groups that has been processed as a batch. A batch is a set of activity instances
+    that, once enabled, wait to be processed as a group (either one after the other or concurrently).
 
-    :param event_log:
-    :param log_ids:
-    :param batch_min_size:
-    :param max_sequential_gap:
-    :return:
+    :param event_log:           the event log to analyze.
+    :param log_ids:             mapping with the IDs of each column in the dataset.
+    :param batch_min_size:      minimum number of activity instances for a batch to be considered as such.
+    :param max_sequential_gap:  maximum time gap (with no processing) between the processing of an activity
+                                instance and the next one to be considered as a batch.
+    :return: a copy of [event_log] with two extra columns, one denoting the ID of the batch and another one denoting
+             the processing type.
     """
     batched_event_log = event_log.copy()
     # First phase: identify single activity batches
