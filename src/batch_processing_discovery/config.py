@@ -43,7 +43,5 @@ DEFAULT_CSV_IDS = EventLogIDs(case='case_id',
 @dataclass
 class BatchType:
     parallel: str = "Parallel"
-    task_sequential: str = "Sequential task-based"
-    task_concurrent: str = "Concurrent task-based"
-    case_sequential: str = "Sequential case-based"
-    case_concurrent: str = "Concurrent case-based"
+    sequential: str = "Sequential"
+    concurrent: str = "Concurrent"

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from batch_processing_discovery.config import EventLogIDs
+from batch_processing_discovery.config import EventLogIDs, BatchType
 
 
 def discover_batches(
@@ -21,9 +21,9 @@ def discover_batches(
     # First phase: identify single activity batches
     _identify_single_activity_batches(batched_event_log, log_ids, batch_min_size, max_sequential_gap)
     # Second phase: identify subprocess batches
-    _identify_subprocess_batches(batched_event_log, log_ids, max_sequential_gap)
+    # _identify_subprocess_batches(batched_event_log, log_ids, max_sequential_gap)
     # Third phase: classify batch type and assign an ID
-    # _classify_batch_types(batched_event_log, log_ids)
+    _classify_batch_types(batched_event_log, log_ids)
     # Return event log with batch information
     return batched_event_log
 
@@ -77,5 +77,38 @@ def _identify_single_activity_batches(
     event_log[log_ids.batch_id] = event_log[log_ids.batch_id].astype('Int64')
 
 
-def _identify_subprocess_batches(event_log: pd.DataFrame, log_ids: EventLogIDs, max_sequential_gap: pd.Timedelta):
-    batches = []
+def _classify_batch_types(event_log: pd.DataFrame, log_ids: EventLogIDs):
+    # Set batch type to NA
+    event_log[log_ids.batch_type] = pd.NA
+    # Check the type of each batch and save the indexes of its events
+    indexes, types = [], []
+    for batch_id, batch_events in event_log[~pd.isna(event_log[log_ids.batch_id])].groupby([log_ids.batch_id]):
+        indexes += list(batch_events.index)
+        if _is_parallel_batch(batch_events, log_ids):
+            types += [BatchType.parallel] * len(batch_events)
+        elif _is_concurrent_batch(batch_events, log_ids):
+            types += [BatchType.concurrent] * len(batch_events)
+        else:
+            types += [BatchType.sequential] * len(batch_events)
+    # Set the batch types
+    event_log.loc[indexes, log_ids.batch_type] = types
+
+
+def _is_parallel_batch(batch_events: pd.DataFrame, log_ids: EventLogIDs) -> bool:
+    # If all events share start and end time, is parallel
+    return (len(batch_events[log_ids.start_time].unique()) == 1 and
+            len(batch_events[log_ids.end_time].unique()) == 1)
+
+
+def _is_concurrent_batch(batch_events: pd.DataFrame, log_ids: EventLogIDs) -> bool:
+    concurrent = False
+    # Sort events and take the start times
+    sorted_batch_events = batch_events.sort_values([log_ids.start_time, log_ids.end_time])
+    starts = list(sorted_batch_events[log_ids.start_time])
+    # Go over the end times checking if they do not overlap with the next batched event
+    for i, end in enumerate(sorted_batch_events[log_ids.end_time]):
+        if len(starts) > (i + 1) and starts[i + 1] < end:
+            # Overlapping, thus concurrent
+            concurrent = True
+    # Return result
+    return concurrent
