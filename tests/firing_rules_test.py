@@ -1,12 +1,30 @@
 import pandas as pd
 
 from batch_processing_discovery.config import DEFAULT_CSV_IDS
-from batch_processing_discovery.firing_rules import _get_size_distribution, _compute_features_table, _get_features
+from batch_processing_discovery.firing_rules import _get_size_distribution, _compute_features_table, _get_features, get_firing_rules
+
+
+def test_get_firing_rules():
+    # Read input event log
+    event_log = pd.read_csv("./assets/event_log_5.csv")
+    event_log[DEFAULT_CSV_IDS.enabled_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.enabled_time], utc=True)
+    event_log[DEFAULT_CSV_IDS.start_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.start_time], utc=True)
+    event_log[DEFAULT_CSV_IDS.end_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.end_time], utc=True)
+    event_log[DEFAULT_CSV_IDS.batch_id] = event_log[DEFAULT_CSV_IDS.batch_id].astype('Int64')
+    # Get the firing rules
+    rules = get_firing_rules(event_log, DEFAULT_CSV_IDS)
+    # Assert
+    assert len(rules) == 1
+    assert rules['B']['sizes'] == {1: 2, 3: 48}
+    assert rules['B']['confidence'] == 1.0
+    assert rules['B']['support'] == 1.0
+    assert rules['B']['model'].ruleset_.rules[0].conds[0].feature == "num_queue"
+    assert rules['B']['model'].ruleset_.rules[0].conds[0].val == 3
 
 
 def test__compute_features_table():
     # Read input event log
-    event_log = pd.read_csv("./assets/event_log_4.csv")
+    event_log = pd.read_csv("./tests/assets/event_log_4.csv")
     event_log[DEFAULT_CSV_IDS.enabled_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.enabled_time], utc=True)
     event_log[DEFAULT_CSV_IDS.start_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.start_time], utc=True)
     event_log[DEFAULT_CSV_IDS.end_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.end_time], utc=True)
@@ -114,7 +132,7 @@ def test__compute_features_table():
 
 def test__get_features():
     # Read input event log
-    event_log = pd.read_csv("./test/assets/event_log_4.csv")
+    event_log = pd.read_csv("./tests/assets/event_log_4.csv")
     event_log[DEFAULT_CSV_IDS.enabled_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.enabled_time], utc=True)
     event_log[DEFAULT_CSV_IDS.start_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.start_time], utc=True)
     event_log[DEFAULT_CSV_IDS.end_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.end_time], utc=True)
