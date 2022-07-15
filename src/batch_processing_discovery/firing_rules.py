@@ -111,7 +111,7 @@ def _compute_features_table(
                     _get_features(
                         event_log,
                         instant,
-                        batch_instance[batch_instance[log_ids.enabled_time] > instant],
+                        batch_instance[batch_instance[log_ids.enabled_time] <= instant],
                         0,
                         log_ids
                     )
