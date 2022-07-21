@@ -1,6 +1,6 @@
 import pandas as pd
 
-from batch_processing_discovery.config import EventLogIDs, BatchType
+from .config import EventLogIDs, BatchType
 
 
 def discover_batches(
