@@ -1,7 +1,7 @@
 import pandas as pd
 
 from batch_processing_discovery.config import DEFAULT_CSV_IDS
-from batch_processing_discovery.firing_rules import _get_size_distribution, get_firing_rules, _get_duration_distribution
+from batch_processing_discovery.batch_characteristics import _get_size_distribution, get_batch_characteristics, _get_duration_distribution
 
 
 def test_get_firing_rules():
@@ -12,7 +12,7 @@ def test_get_firing_rules():
     event_log[DEFAULT_CSV_IDS.end_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.end_time], utc=True)
     event_log[DEFAULT_CSV_IDS.batch_id] = event_log[DEFAULT_CSV_IDS.batch_id].astype('Int64')
     # Get the firing rules
-    rules = get_firing_rules(event_log, DEFAULT_CSV_IDS)
+    rules = get_batch_characteristics(event_log, DEFAULT_CSV_IDS)
     # Assert
     assert len(rules) == 1
     rule = rules[0]

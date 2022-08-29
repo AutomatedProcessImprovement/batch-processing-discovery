@@ -6,7 +6,7 @@ from .features_table import _compute_features_table
 from .rules import _get_rules
 
 
-def get_firing_rules(event_log: pd.DataFrame, log_ids: EventLogIDs, resource_aware: bool = False) -> list:
+def get_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs, resource_aware: bool = False) -> list:
     """
     Discover the batch characteristics of the batches in [event_log].
 
