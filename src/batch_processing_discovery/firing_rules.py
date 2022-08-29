@@ -1,4 +1,5 @@
 import pandas as pd
+from numpy import mean
 
 from .config import EventLogIDs
 from .features_table import _compute_features_table
@@ -45,7 +46,7 @@ def get_firing_rules(event_log: pd.DataFrame, log_ids: EventLogIDs, resource_awa
             # Get the batch frequency
             batch_frequency = (sum(size_distribution.values()) - size_distribution[1]) / sum(size_distribution.values())
             # Get the batch duration distribution
-            duration_distribution = None  # TODO _get_duration_distribution(grouped_instances, log_ids)
+            duration_distribution = _get_duration_distribution(grouped_instances, log_ids)
             # Get the activation rules
             firing_rules = []
             if len(features_table['outcome'].unique()) > 1:
@@ -86,3 +87,42 @@ def _get_size_distribution(event_log: pd.DataFrame, log_ids: EventLogIDs) -> dic
     sizes[1] = len(event_log) - len(batched_executions)
     # Return size distribution
     return sizes
+
+
+def _get_duration_distribution(event_log: pd.DataFrame, log_ids: EventLogIDs) -> dict:
+    """
+    Get the distribution of scale factors for the duration of the batched activity, depending on the number of instances batched. For,
+    example, an activity can last x0.9 when is executed in a batch of two, and x0.8 if it is executed in a batch of three.
+
+    :param event_log:       event log with the activity instances of the same activity, or of the same activity and performed by the
+                            same result (if [resource_aware] is true.
+    :param log_ids:         mapping with the IDs of each column in the dataset.
+
+    :return: a dict with the batch size as keys, and the scale factor for the duration of the activity
+    instances executed in batches of that size as values.
+    """
+    # Copy log to edit
+    event_log_copy = event_log.copy()
+    # Set activity duration as new column
+    event_log_copy['duration'] = event_log_copy[log_ids.end_time] - event_log_copy[log_ids.start_time]
+    # Save durations of no batched activity instances
+    no_batched_durations = list(event_log_copy[pd.isna(event_log_copy[log_ids.batch_id])]['duration'])
+    # For each batch size, record its activity duration
+    batched_durations = {}
+    batched_executions = event_log_copy[~pd.isna(event_log_copy[log_ids.batch_id])]
+    for batch_id, events in batched_executions.groupby([log_ids.batch_id]):
+        batch_size = len(events)
+        batched_durations[batch_size] = batched_durations.get(batch_size, []) + list(events['duration'])
+    # Compute scale factor of mean value
+    durations = {}
+    if len(no_batched_durations) > 0:
+        mean_no_batched = mean(no_batched_durations)
+        for size in batched_durations.keys():
+            durations[size] = mean(batched_durations[size]) / mean_no_batched
+    else:
+        print("WARNING! No non-batched executions to learn duration scaling factor, setting 1.0 as default.")
+        for size in batched_durations.keys():
+            durations[size] = 1.0
+        pass
+    # Return durations
+    return durations
