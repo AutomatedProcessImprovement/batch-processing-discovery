@@ -27,11 +27,11 @@ def test__compute_features_table():
             DEFAULT_CSV_IDS.batch_type: 'Sequential',
             DEFAULT_CSV_IDS.activity: "A",
             DEFAULT_CSV_IDS.resource: "Jonathan",
-            'instant': pd.Timestamp("2021-01-01T09:30:00+00:00"),
+            'instant': pd.Timestamp("2021-01-01T09:30:00+00:00").value / 10 ** 9,
             'num_queue': 3,
-            't_ready': pd.Timedelta(seconds=1800),
-            't_waiting': pd.Timedelta(hours=1),
-            't_max_flow': pd.Timedelta(hours=1, seconds=1800),
+            't_ready': pd.Timedelta(seconds=1800).total_seconds(),
+            't_waiting': pd.Timedelta(hours=1).total_seconds(),
+            't_max_flow': pd.Timedelta(hours=1, seconds=1800).total_seconds(),
             'day_of_week': 4,
             'day_of_month': 1,
             'hour_of_day': 9,
@@ -42,11 +42,11 @@ def test__compute_features_table():
             DEFAULT_CSV_IDS.batch_type: 'Sequential',
             DEFAULT_CSV_IDS.activity: "C",
             DEFAULT_CSV_IDS.resource: "Jolyne",
-            'instant': pd.Timestamp("2021-01-01T14:00:00+00:00"),
+            'instant': pd.Timestamp("2021-01-01T14:00:00+00:00").value / 10 ** 9,
             'num_queue': 3,
-            't_ready': pd.Timedelta(hours=1, seconds=1800),
-            't_waiting': pd.Timedelta(hours=2, seconds=1800),
-            't_max_flow': pd.Timedelta(hours=6),
+            't_ready': pd.Timedelta(hours=1, seconds=1800).total_seconds(),
+            't_waiting': pd.Timedelta(hours=2, seconds=1800).total_seconds(),
+            't_max_flow': pd.Timedelta(hours=6).total_seconds(),
             'day_of_week': 4,
             'day_of_month': 1,
             'hour_of_day': 14,
@@ -57,11 +57,11 @@ def test__compute_features_table():
             DEFAULT_CSV_IDS.batch_type: 'Concurrent',
             DEFAULT_CSV_IDS.activity: "E",
             DEFAULT_CSV_IDS.resource: "Jonathan",
-            'instant': pd.Timestamp("2021-01-01T16:00:00+00:00"),
+            'instant': pd.Timestamp("2021-01-01T16:00:00+00:00").value / 10 ** 9,
             'num_queue': 3,
-            't_ready': pd.Timedelta(0),
-            't_waiting': pd.Timedelta(0),
-            't_max_flow': pd.Timedelta(hours=8),
+            't_ready': pd.Timedelta(0).total_seconds(),
+            't_waiting': pd.Timedelta(0).total_seconds(),
+            't_max_flow': pd.Timedelta(hours=8).total_seconds(),
             'day_of_week': 4,
             'day_of_month': 1,
             'hour_of_day': 16,
@@ -72,11 +72,11 @@ def test__compute_features_table():
             DEFAULT_CSV_IDS.batch_type: 'Sequential',
             DEFAULT_CSV_IDS.activity: "F",
             DEFAULT_CSV_IDS.resource: "Joseph",
-            'instant': pd.Timestamp("2021-01-01T17:00:00+00:00"),
+            'instant': pd.Timestamp("2021-01-01T17:00:00+00:00").value / 10 ** 9,
             'num_queue': 3,
-            't_ready': pd.Timedelta(0),
-            't_waiting': pd.Timedelta(seconds=1800),
-            't_max_flow': pd.Timedelta(hours=9),
+            't_ready': pd.Timedelta(0).total_seconds(),
+            't_waiting': pd.Timedelta(seconds=1800).total_seconds(),
+            't_max_flow': pd.Timedelta(hours=9).total_seconds(),
             'day_of_week': 4,
             'day_of_month': 1,
             'hour_of_day': 17,
@@ -88,27 +88,27 @@ def test__compute_features_table():
     # Check that the negative observations are there
     neg_features_batch_0 = features_table[(features_table['outcome'] == 0) & (features_table[DEFAULT_CSV_IDS.batch_id] == 0)]
     assert neg_features_batch_0['instant'].isin([
-        pd.Timestamp("2021-01-01T08:30:00+00:00"),
-        pd.Timestamp("2021-01-01T08:45:00+00:00"),
-        pd.Timestamp("2021-01-01T09:00:00+00:00"),
-        pd.Timestamp("2021-01-01T09:10:00+00:00"),
-        pd.Timestamp("2021-01-01T09:20:00+00:00"),
+        pd.Timestamp("2021-01-01T08:30:00+00:00").value / 10 ** 9,
+        pd.Timestamp("2021-01-01T08:45:00+00:00").value / 10 ** 9,
+        pd.Timestamp("2021-01-01T09:00:00+00:00").value / 10 ** 9,
+        pd.Timestamp("2021-01-01T09:10:00+00:00").value / 10 ** 9,
+        pd.Timestamp("2021-01-01T09:20:00+00:00").value / 10 ** 9,
     ]).all()
     neg_features_batch_1 = features_table[(features_table['outcome'] == 0) & (features_table[DEFAULT_CSV_IDS.batch_id] == 1)]
     assert neg_features_batch_1['instant'].isin([
-        pd.Timestamp("2021-01-01T11:30:00+00:00"),
-        pd.Timestamp("2021-01-01T12:00:00+00:00"),
-        pd.Timestamp("2021-01-01T12:30:00+00:00"),
-        pd.Timestamp("2021-01-01T13:00:00+00:00"),
-        pd.Timestamp("2021-01-01T13:30:00+00:00"),
+        pd.Timestamp("2021-01-01T11:30:00+00:00").value / 10 ** 9,
+        pd.Timestamp("2021-01-01T12:00:00+00:00").value / 10 ** 9,
+        pd.Timestamp("2021-01-01T12:30:00+00:00").value / 10 ** 9,
+        pd.Timestamp("2021-01-01T13:00:00+00:00").value / 10 ** 9,
+        pd.Timestamp("2021-01-01T13:30:00+00:00").value / 10 ** 9,
     ]).all()
     neg_features_batch_2 = features_table[(features_table['outcome'] == 0) & (features_table[DEFAULT_CSV_IDS.batch_id] == 2)]
     assert len(neg_features_batch_2) == 0
     neg_features_batch_3 = features_table[(features_table['outcome'] == 0) & (features_table[DEFAULT_CSV_IDS.batch_id] == 3)]
     assert neg_features_batch_3['instant'].isin([
-        pd.Timestamp("2021-01-01T16:30:00+00:00"),
-        pd.Timestamp("2021-01-01T16:45:00+00:00"),
-        pd.Timestamp("2021-01-01T17:00:00+00:00")
+        pd.Timestamp("2021-01-01T16:30:00+00:00").value / 10 ** 9,
+        pd.Timestamp("2021-01-01T16:45:00+00:00").value / 10 ** 9,
+        pd.Timestamp("2021-01-01T17:00:00+00:00").value / 10 ** 9
     ]).all()
 
 

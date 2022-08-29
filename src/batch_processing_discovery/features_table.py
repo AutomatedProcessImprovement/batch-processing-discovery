@@ -1,5 +1,6 @@
 import random
 
+import numpy as np
 import pandas as pd
 
 from .config import EventLogIDs
@@ -72,7 +73,14 @@ def _compute_features_table(
                         log_ids
                     )
                 ]
-    return pd.DataFrame(data=features)
+    # Transform duration to seconds
+    features_table = pd.DataFrame(data=features)
+    features_table['instant'] = features_table['instant'].astype(np.int64) / 10 ** 9
+    features_table['t_ready'] = features_table['t_ready'].apply(lambda t: t.total_seconds())
+    features_table['t_waiting'] = features_table['t_waiting'].apply(lambda t: t.total_seconds())
+    features_table['t_max_flow'] = features_table['t_max_flow'].apply(lambda t: t.total_seconds())
+    # Return table
+    return features_table
 
 
 def _get_features(
