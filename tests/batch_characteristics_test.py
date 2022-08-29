@@ -1,7 +1,7 @@
 import pandas as pd
 
-from batch_processing_discovery.config import DEFAULT_CSV_IDS
 from batch_processing_discovery.batch_characteristics import _get_size_distribution, get_batch_characteristics, _get_duration_distribution
+from batch_processing_discovery.config import DEFAULT_CSV_IDS
 
 
 def test_get_firing_rules():
@@ -22,6 +22,15 @@ def test_get_firing_rules():
     assert rule['batch_frequency'] == 48 / 50
     assert rule['size_distribution'] == {1: 2, 3: 48}
     assert rule['duration_distribution'] == {3: 0.5}
+    assert rule['firing_rules'] == {
+        'confidence': 1.0,
+        'support': 1.0,
+        'rules': [
+            [
+                {'feature': "num_queue", 'condition': "equals", 'value': "3"}
+            ]
+        ]
+    }
 
 
 def test__get_size_distribution():

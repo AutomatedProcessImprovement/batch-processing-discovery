@@ -68,3 +68,47 @@ def _get_rules(
         }
     else:
         return {}
+
+
+def _parse_rules(model) -> list:
+    """
+    Transform the rules from a RIPPER model into a list of sublists (OR of ANDs), where the rule is fulfilled when one
+    of the sublists (OR) have all its rules met (AND).
+
+    :param model: RIPPER model to transform.
+    :return: list of sublists with the rules.
+    """
+    rules = []
+    # Go over the rules transforming them
+    for ruleset in model.ruleset_.rules:
+        # For each set of rules (sublist)
+        sublist = []
+        for condition in ruleset.conds:
+            if type(condition.val) is not str:
+                # Single number
+                operator = "equals"
+                value = str(condition.val)
+            elif "<" in condition.val:
+                # Lower than
+                operator = "lower than"
+                value = condition.val.replace("<", "")
+            elif ">" in condition.val:
+                # Greater than
+                operator = "greater than"
+                value = condition.val.replace(">", "")
+            else:
+                # Interval
+                indexes = [i for i, char in enumerate(condition.val) if i > 0 and char == "-" and condition.val[i - 1] != 'e']
+                if len(indexes) == 1:
+                    index = indexes[0]
+                    operator = "in"
+                    value = [condition.val[:index], condition.val[index + 1:]]
+                else:
+                    print("Error parsing interval '{}', couldn't find the separating character '-'.".format(condition.val))
+                    operator = "null"
+                    value = "null"
+            sublist += [{'feature': condition.feature, 'condition': operator, 'value': value}]
+        # Add sublist of rules to complete
+        rules += [sublist]
+    # Return the rules
+    return rules

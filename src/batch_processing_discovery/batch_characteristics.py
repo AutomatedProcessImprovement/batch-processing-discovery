@@ -3,7 +3,7 @@ from numpy import mean
 
 from .config import EventLogIDs
 from .features_table import _compute_features_table
-from .rules import _get_rules
+from .rules import _get_rules, _parse_rules
 
 
 def get_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs, resource_aware: bool = False) -> list:
@@ -48,12 +48,13 @@ def get_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs, res
             # Get the batch duration distribution
             duration_distribution = _get_duration_distribution(grouped_instances, log_ids)
             # Get the activation rules
-            firing_rules = []
+            firing_rules = {}
             if len(features_table['outcome'].unique()) > 1:
                 discovered_rules = _get_rules(features_table, 'outcome')
                 if len(discovered_rules) > 0:
-                    # TODO process rules to translate them to ORs of ANDs
-                    firing_rules += [discovered_rules]
+                    firing_rules['confidence'] = discovered_rules['confidence']
+                    firing_rules['support'] = discovered_rules['support']
+                    firing_rules['rules'] = _parse_rules(discovered_rules['model'])
                 # Create batch dictionary
                 batches += [{
                     'activity': grouped_instances[log_ids.activity].iloc[0],
