@@ -2,19 +2,14 @@ import pandas as pd
 from numpy import mean
 
 from .config import EventLogIDs
+from .discovery import discover_batches
 from .features_table import _compute_features_table
 from .rules import _get_rules, _parse_rules
 
 
-def get_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs, resource_aware: bool = False) -> list:
+def discover_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs, resource_aware: bool = False) -> list:
     """
-    Discover the batch characteristics of the batches in [event_log].
-
-    :param event_log:       event log with the batch information already discovered.
-    :param log_ids:         mapping with the IDs of each column in the dataset.
-    :param resource_aware:  if True, take into the account both the resource and the executed activity
-                            for the rules discovery.
-    :return: a list with the characteristics of each batch:
+    Discover, from [event_log], the activities being processed as a batch, and the characteristics of the batches:
         - The activity being executed.
         - The resources involved in the batch processing
         - The type of batch (most common if more than one)
@@ -25,6 +20,31 @@ def get_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs, res
         factor of the duration of the activity instances processed in that batch. For example, if the activity
         is processed in a 2-size batch, each activity instance lasts x0.7 what it lasts executed individually.
         - The firing rules that better describe the start of the batch.
+
+    :param event_log:       event log to discover the batches and their characteristics.
+    :param log_ids:         mapping with the IDs of each column in the dataset.
+    :param resource_aware:  if True, take into the account both the resource and the executed activity
+                            for the characteristics discovery.
+    :return: a list with the characteristics of each discovered batch.
+
+    """
+    # Discover batch behavior
+    batched_event_log = discover_batches(event_log, log_ids)
+    # Get the characteristics of each bach
+    batch_characteristics = _get_batch_characteristics(batched_event_log, log_ids, resource_aware)
+    # Return characteristics
+    return batch_characteristics
+
+
+def _get_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs, resource_aware: bool = False) -> list:
+    """
+    Get the characteristics of the batches present in in [event_log].
+
+    :param event_log:       event log with the batch information already discovered.
+    :param log_ids:         mapping with the IDs of each column in the dataset.
+    :param resource_aware:  if True, take into the account both the resource and the executed activity
+                            for the rules discovery.
+    :return: a list with the characteristics of each batch.
     """
     # Prepare datasets based on the type
     if resource_aware:

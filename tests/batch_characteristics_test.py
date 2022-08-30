@@ -1,10 +1,40 @@
 import pandas as pd
 
-from batch_processing_discovery.batch_characteristics import _get_size_distribution, get_batch_characteristics, _get_duration_distribution
+from batch_processing_discovery.batch_characteristics import _get_size_distribution, _get_batch_characteristics, \
+    _get_duration_distribution, discover_batch_characteristics
 from batch_processing_discovery.config import DEFAULT_CSV_IDS
 
 
-def test_get_firing_rules():
+def test_discover_batch_characteristics():
+    # Read input event log
+    event_log = pd.read_csv("./tests/assets/event_log_5.csv")
+    event_log.drop([DEFAULT_CSV_IDS.batch_id, DEFAULT_CSV_IDS.batch_type], axis=1, inplace=True)
+    event_log[DEFAULT_CSV_IDS.enabled_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.enabled_time], utc=True)
+    event_log[DEFAULT_CSV_IDS.start_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.start_time], utc=True)
+    event_log[DEFAULT_CSV_IDS.end_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.end_time], utc=True)
+    # Get the firing rules
+    rules = discover_batch_characteristics(event_log, DEFAULT_CSV_IDS)
+    # Assert
+    assert len(rules) == 1
+    rule = rules[0]
+    assert rule['activity'] == 'B'
+    assert rule['resources'] == ['Jolyne']
+    assert rule['type'] == 'Sequential'
+    assert rule['batch_frequency'] == 48 / 50
+    assert rule['size_distribution'] == {1: 2, 3: 48}
+    assert rule['duration_distribution'] == {3: 0.5}
+    assert rule['firing_rules'] == {
+        'confidence': 1.0,
+        'support': 1.0,
+        'rules': [
+            [
+                {'feature': "num_queue", 'condition': "equals", 'value': "3"}
+            ]
+        ]
+    }
+
+
+def test__get_batch_characteristics():
     # Read input event log
     event_log = pd.read_csv("./tests/assets/event_log_5.csv")
     event_log[DEFAULT_CSV_IDS.enabled_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.enabled_time], utc=True)
@@ -12,7 +42,7 @@ def test_get_firing_rules():
     event_log[DEFAULT_CSV_IDS.end_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.end_time], utc=True)
     event_log[DEFAULT_CSV_IDS.batch_id] = event_log[DEFAULT_CSV_IDS.batch_id].astype('Int64')
     # Get the firing rules
-    rules = get_batch_characteristics(event_log, DEFAULT_CSV_IDS)
+    rules = _get_batch_characteristics(event_log, DEFAULT_CSV_IDS)
     # Assert
     assert len(rules) == 1
     rule = rules[0]
