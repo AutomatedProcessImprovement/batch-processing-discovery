@@ -1,1 +1,1 @@
-__all__ = ['discovery']
+__all__ = ['batch_characteristics', 'discovery', 'config']

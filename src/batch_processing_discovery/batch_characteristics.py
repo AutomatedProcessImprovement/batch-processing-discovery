@@ -7,7 +7,13 @@ from .features_table import _compute_features_table
 from .rules import _get_rules, _parse_rules
 
 
-def discover_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs, resource_aware: bool = False) -> list:
+def discover_batch_processing_and_characteristics(
+        event_log: pd.DataFrame,
+        log_ids: EventLogIDs,
+        batch_min_size: int = 2,
+        max_sequential_gap: pd.Timedelta = pd.Timedelta(0),
+        resource_aware: bool = False
+) -> list:
     """
     Discover, from [event_log], the activities being processed as a batch, and the characteristics of the batches:
         - The activity being executed.
@@ -21,22 +27,34 @@ def discover_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs
         is processed in a 2-size batch, each activity instance lasts x0.7 what it lasts executed individually.
         - The firing rules that better describe the start of the batch.
 
-    :param event_log:       event log to discover the batches and their characteristics.
-    :param log_ids:         mapping with the IDs of each column in the dataset.
-    :param resource_aware:  if True, take into the account both the resource and the executed activity
-                            for the characteristics discovery.
+    :param event_log:           event log to discover the batches and their characteristics.
+    :param log_ids:             mapping with the IDs of each column in the dataset.
+    :param batch_min_size:      (for discovery) minimum number of activity instances for a batch to be considered as such.
+    :param max_sequential_gap:  (for discovery) maximum time gap (with no processing) between the processing of an activity
+                                instance and the next one to be considered as a batch.
+    :param resource_aware:      (for characteristics extraction) if True, take into the account both the resource and the
+                                executed activity for the characteristics discovery.
     :return: a list with the characteristics of each discovered batch.
 
     """
     # Discover batch behavior
-    batched_event_log = discover_batches(event_log, log_ids)
+    batched_event_log = discover_batches(
+        event_log=event_log,
+        log_ids=log_ids,
+        batch_min_size=batch_min_size,
+        max_sequential_gap=max_sequential_gap
+    )
     # Get the characteristics of each bach
-    batch_characteristics = _get_batch_characteristics(batched_event_log, log_ids, resource_aware)
+    batch_characteristics = get_batch_characteristics(
+        event_log=batched_event_log,
+        log_ids=log_ids,
+        resource_aware=resource_aware
+    )
     # Return characteristics
     return batch_characteristics
 
 
-def _get_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs, resource_aware: bool = False) -> list:
+def get_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs, resource_aware: bool = False) -> list:
     """
     Get the characteristics of the batches present in in [event_log].
 

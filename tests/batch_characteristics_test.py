@@ -1,7 +1,7 @@
 import pandas as pd
 
-from batch_processing_discovery.batch_characteristics import _get_size_distribution, _get_batch_characteristics, \
-    _get_duration_distribution, discover_batch_characteristics
+from batch_processing_discovery.batch_characteristics import _get_size_distribution, get_batch_characteristics, \
+    _get_duration_distribution, discover_batch_processing_and_characteristics
 from batch_processing_discovery.config import DEFAULT_CSV_IDS
 
 
@@ -13,7 +13,7 @@ def test_discover_batch_characteristics():
     event_log[DEFAULT_CSV_IDS.start_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.start_time], utc=True)
     event_log[DEFAULT_CSV_IDS.end_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.end_time], utc=True)
     # Get the firing rules
-    rules = discover_batch_characteristics(event_log, DEFAULT_CSV_IDS)
+    rules = discover_batch_processing_and_characteristics(event_log, DEFAULT_CSV_IDS)
     # Assert
     assert len(rules) == 1
     rule = rules[0]
@@ -34,7 +34,7 @@ def test_discover_batch_characteristics():
     }
 
 
-def test__get_batch_characteristics():
+def test_get_batch_characteristics():
     # Read input event log
     event_log = pd.read_csv("./tests/assets/event_log_5.csv")
     event_log[DEFAULT_CSV_IDS.enabled_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.enabled_time], utc=True)
@@ -42,7 +42,7 @@ def test__get_batch_characteristics():
     event_log[DEFAULT_CSV_IDS.end_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.end_time], utc=True)
     event_log[DEFAULT_CSV_IDS.batch_id] = event_log[DEFAULT_CSV_IDS.batch_id].astype('Int64')
     # Get the firing rules
-    rules = _get_batch_characteristics(event_log, DEFAULT_CSV_IDS)
+    rules = get_batch_characteristics(event_log, DEFAULT_CSV_IDS)
     # Assert
     assert len(rules) == 1
     rule = rules[0]
