@@ -88,5 +88,5 @@ batch_characteristics = get_batch_characteristics(
 
 ## ** No enabled time available
 
-If there is no enabled time available in the event log, consider
+In case of not enabled time available in the event log, consider
 using [this Python library](https://github.com/AutomatedProcessImprovement/start-time-estimator) to estimate them.
