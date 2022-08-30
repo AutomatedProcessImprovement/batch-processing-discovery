@@ -24,8 +24,8 @@ The discovered characteristics are, for each batch processing:
 
 ## Basic Usage
 
-Here we provide a simple example of use with default configuration (
-see [function documentation](https://github.com/AutomatedProcessImprovement/batch-processing-discovery/blob/main/src/batch_processing_discovery/batch_characteristics.py)
+Here we provide a simple example of use with default configuration (see
+[function documentation](https://github.com/AutomatedProcessImprovement/batch-processing-discovery/blob/main/src/batch_processing_discovery/batch_characteristics.py)
 for more parameters):
 
 ```python
@@ -45,8 +45,8 @@ batch_characteristics = discover_batch_processing_and_characteristics(
 
 ### Discover only batch processing behavior
 
-In case of being interested only in discovering batch processing behavior, the following example applies (
-see [function documentation](https://github.com/AutomatedProcessImprovement/batch-processing-discovery/blob/main/src/batch_processing_discovery/discovery.py)
+In case of being interested only in discovering batch processing behavior, the following example applies (see
+[function documentation](https://github.com/AutomatedProcessImprovement/batch-processing-discovery/blob/main/src/batch_processing_discovery/discovery.py)
 for more parameters):
 
 ```python
@@ -67,8 +67,8 @@ batched_event_log = discover_batches(
 ### Get batch characteristics with already set batch processing behavior
 
 In case of being interested only in getting the batch characteristics, based on an event log with already set batch behavior, the following
-example applies (
-see [function documentation](https://github.com/AutomatedProcessImprovement/batch-processing-discovery/blob/main/src/batch_processing_discovery/batch_characteristics.py)
+example applies (see
+[function documentation](https://github.com/AutomatedProcessImprovement/batch-processing-discovery/blob/main/src/batch_processing_discovery/batch_characteristics.py)
 for more parameters):
 
 ```python
