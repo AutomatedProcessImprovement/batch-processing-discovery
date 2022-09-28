@@ -45,7 +45,7 @@ def discover_batch_processing_and_characteristics(
         max_sequential_gap=max_sequential_gap
     )
     # Get the characteristics of each bach
-    batch_characteristics = get_batch_characteristics(
+    batch_characteristics = discover_batch_characteristics(
         event_log=batched_event_log,
         log_ids=log_ids,
         resource_aware=resource_aware
@@ -54,7 +54,7 @@ def discover_batch_processing_and_characteristics(
     return batch_characteristics
 
 
-def get_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs, resource_aware: bool = False) -> list:
+def discover_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs, resource_aware: bool = False) -> list:
     """
     Get the characteristics of the batches present in in [event_log].
 

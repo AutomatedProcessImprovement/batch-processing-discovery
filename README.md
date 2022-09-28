@@ -74,13 +74,13 @@ for more parameters):
 ```python
 import pandas as pd
 
-from batch_processing_discovery.batch_characteristics import get_batch_characteristics
+from batch_processing_discovery.batch_characteristics import discover_batch_characteristics
 from batch_processing_discovery.config import DEFAULT_CSV_IDS
 
 # Read event log
 event_log = pd.read_csv("path/to/event/log_with_batch_info.csv.gz")
 # Discover batch processing activities and their characteristics
-batch_characteristics = get_batch_characteristics(
+batch_characteristics = discover_batch_characteristics(
     event_log=event_log,
     log_ids=DEFAULT_CSV_IDS
 )
