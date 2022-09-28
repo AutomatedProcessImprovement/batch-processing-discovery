@@ -5,7 +5,7 @@ from batch_processing_discovery.batch_characteristics import _get_size_distribut
 from batch_processing_discovery.config import DEFAULT_CSV_IDS
 
 
-def test_discover_batch_characteristics():
+def test_discover_batch_processing_and_characteristics():
     # Read input event log
     event_log = pd.read_csv("./tests/assets/event_log_5.csv")
     event_log.drop([DEFAULT_CSV_IDS.batch_id, DEFAULT_CSV_IDS.batch_type], axis=1, inplace=True)
@@ -34,7 +34,7 @@ def test_discover_batch_characteristics():
     }
 
 
-def test_get_batch_characteristics():
+def test_discover_batch_characteristics():
     # Read input event log
     event_log = pd.read_csv("./tests/assets/event_log_5.csv")
     event_log[DEFAULT_CSV_IDS.enabled_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.enabled_time], utc=True)
