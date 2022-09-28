@@ -86,15 +86,15 @@ def _parse_rules(model) -> list:
         for condition in ruleset.conds:
             if type(condition.val) is not str:
                 # Single number
-                operator = "equals"
+                operator = "="
                 value = str(condition.val)
             elif "<" in condition.val:
                 # Lower than
-                operator = "lower than"
+                operator = "<="
                 value = condition.val.replace("<", "")
             elif ">" in condition.val:
                 # Greater than
-                operator = "greater than"
+                operator = ">="
                 value = condition.val.replace(">", "")
             else:
                 # Interval
@@ -107,7 +107,7 @@ def _parse_rules(model) -> list:
                     print("Error parsing interval '{}', couldn't find the separating character '-'.".format(condition.val))
                     operator = "null"
                     value = "null"
-            sublist += [{'feature': condition.feature, 'condition': operator, 'value': value}]
+            sublist += [{'attribute': condition.feature, 'condition': operator, 'value': value}]
         # Add sublist of rules to complete
         rules += [sublist]
     # Return the rules
