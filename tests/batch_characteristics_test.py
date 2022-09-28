@@ -28,7 +28,7 @@ def test_discover_batch_characteristics():
         'support': 1.0,
         'rules': [
             [
-                {'feature': "num_queue", 'condition': "equals", 'value': "3"}
+                {'feature': "batch_size", 'condition': "equals", 'value': "3"}
             ]
         ]
     }
@@ -57,7 +57,7 @@ def test_get_batch_characteristics():
         'support': 1.0,
         'rules': [
             [
-                {'feature': "num_queue", 'condition': "equals", 'value': "3"}
+                {'feature': "batch_size", 'condition': "equals", 'value': "3"}
             ]
         ]
     }

@@ -16,8 +16,8 @@ def test__compute_features_table():
     # Assert features
     # 1 positive observation per batch
     assert len(features_table[features_table['outcome'] == 1]) == 4
-    # 4 negative observations for the sequential with WT_ready, 2 negative for
-    # the sequential with no WT_ready, and 0 for the concurrent with no WTs
+    # 4 negative observations for the sequential with Wbatch_ready_wt, 2 negative for
+    # the sequential with no Wbatch_ready_wt, and 0 for the concurrent with no WTs
     assert len(features_table[features_table['outcome'] == 0]) == 10
     assert len(features_table) == 14
     # Check that each of the positive observations are there
@@ -28,14 +28,14 @@ def test__compute_features_table():
             DEFAULT_CSV_IDS.activity: "A",
             DEFAULT_CSV_IDS.resource: "Jonathan",
             'instant': pd.Timestamp("2021-01-01T09:30:00+00:00").value / 10 ** 9,
-            'num_queue': 3,
-            't_ready': pd.Timedelta(seconds=1800).total_seconds(),
-            't_waiting': pd.Timedelta(hours=1).total_seconds(),
-            't_max_flow': pd.Timedelta(hours=1, seconds=1800).total_seconds(),
-            'day_of_week': 4,
-            'day_of_month': 1,
-            'hour_of_day': 9,
-            'minute': 30,
+            'batch_size': 3,
+            'batch_ready_wt': pd.Timedelta(seconds=1800).total_seconds(),
+            'batch_max_wt': pd.Timedelta(hours=1).total_seconds(),
+            'max_cycle_time': pd.Timedelta(hours=1, seconds=1800).total_seconds(),
+            'week_day': 4,
+            # 'day_of_month': 1,
+            'daily_hour': 9,
+            # 'minute': 30,
             'outcome': 1
         }, {
             DEFAULT_CSV_IDS.batch_id: 1,
@@ -43,14 +43,14 @@ def test__compute_features_table():
             DEFAULT_CSV_IDS.activity: "C",
             DEFAULT_CSV_IDS.resource: "Jolyne",
             'instant': pd.Timestamp("2021-01-01T14:00:00+00:00").value / 10 ** 9,
-            'num_queue': 3,
-            't_ready': pd.Timedelta(hours=1, seconds=1800).total_seconds(),
-            't_waiting': pd.Timedelta(hours=2, seconds=1800).total_seconds(),
-            't_max_flow': pd.Timedelta(hours=6).total_seconds(),
-            'day_of_week': 4,
-            'day_of_month': 1,
-            'hour_of_day': 14,
-            'minute': 00,
+            'batch_size': 3,
+            'batch_ready_wt': pd.Timedelta(hours=1, seconds=1800).total_seconds(),
+            'batch_max_wt': pd.Timedelta(hours=2, seconds=1800).total_seconds(),
+            'max_cycle_time': pd.Timedelta(hours=6).total_seconds(),
+            'week_day': 4,
+            # 'day_of_month': 1,
+            'daily_hour': 14,
+            # 'minute': 00,
             'outcome': 1
         }, {
             DEFAULT_CSV_IDS.batch_id: 2,
@@ -58,14 +58,14 @@ def test__compute_features_table():
             DEFAULT_CSV_IDS.activity: "E",
             DEFAULT_CSV_IDS.resource: "Jonathan",
             'instant': pd.Timestamp("2021-01-01T16:00:00+00:00").value / 10 ** 9,
-            'num_queue': 3,
-            't_ready': pd.Timedelta(0).total_seconds(),
-            't_waiting': pd.Timedelta(0).total_seconds(),
-            't_max_flow': pd.Timedelta(hours=8).total_seconds(),
-            'day_of_week': 4,
-            'day_of_month': 1,
-            'hour_of_day': 16,
-            'minute': 00,
+            'batch_size': 3,
+            'batch_ready_wt': pd.Timedelta(0).total_seconds(),
+            'batch_max_wt': pd.Timedelta(0).total_seconds(),
+            'max_cycle_time': pd.Timedelta(hours=8).total_seconds(),
+            'week_day': 4,
+            # 'day_of_month': 1,
+            'daily_hour': 16,
+            # 'minute': 00,
             'outcome': 1
         }, {
             DEFAULT_CSV_IDS.batch_id: 3,
@@ -73,14 +73,14 @@ def test__compute_features_table():
             DEFAULT_CSV_IDS.activity: "F",
             DEFAULT_CSV_IDS.resource: "Joseph",
             'instant': pd.Timestamp("2021-01-01T17:00:00+00:00").value / 10 ** 9,
-            'num_queue': 3,
-            't_ready': pd.Timedelta(0).total_seconds(),
-            't_waiting': pd.Timedelta(seconds=1800).total_seconds(),
-            't_max_flow': pd.Timedelta(hours=9).total_seconds(),
-            'day_of_week': 4,
-            'day_of_month': 1,
-            'hour_of_day': 17,
-            'minute': 00,
+            'batch_size': 3,
+            'batch_ready_wt': pd.Timedelta(0).total_seconds(),
+            'batch_max_wt': pd.Timedelta(seconds=1800).total_seconds(),
+            'max_cycle_time': pd.Timedelta(hours=9).total_seconds(),
+            'week_day': 4,
+            # 'day_of_month': 1,
+            'daily_hour': 17,
+            # 'minute': 00,
             'outcome': 1
         }
     ])
@@ -133,14 +133,14 @@ def test__get_features():
         DEFAULT_CSV_IDS.activity: "A",
         DEFAULT_CSV_IDS.resource: "Jonathan",
         'instant': pd.Timestamp("2021-01-01T09:30:00+00:00"),
-        'num_queue': 3,
-        't_ready': pd.Timedelta(seconds=1800),
-        't_waiting': pd.Timedelta(hours=1),
-        't_max_flow': pd.Timedelta(hours=1, seconds=1800),
-        'day_of_week': 4,
-        'day_of_month': 1,
-        'hour_of_day': 9,
-        'minute': 30,
+        'batch_size': 3,
+        'batch_ready_wt': pd.Timedelta(seconds=1800),
+        'batch_max_wt': pd.Timedelta(hours=1),
+        'max_cycle_time': pd.Timedelta(hours=1, seconds=1800),
+        'week_day': 4,
+        # 'day_of_month': 1,
+        'daily_hour': 9,
+        # 'minute': 30,
         'outcome': 1
     }
     # Assert the features of the enabling instant in the middle of the accumulation
@@ -160,14 +160,14 @@ def test__get_features():
         DEFAULT_CSV_IDS.activity: "A",
         DEFAULT_CSV_IDS.resource: "Jonathan",
         'instant': pd.Timestamp("2021-01-01T08:45:00+00:00"),
-        'num_queue': 2,
-        't_ready': pd.Timedelta(0),
-        't_waiting': pd.Timedelta(seconds=900),
-        't_max_flow': pd.Timedelta(seconds=2700),
-        'day_of_week': 4,
-        'day_of_month': 1,
-        'hour_of_day': 8,
-        'minute': 45,
+        'batch_size': 2,
+        'batch_ready_wt': pd.Timedelta(0),
+        'batch_max_wt': pd.Timedelta(seconds=900),
+        'max_cycle_time': pd.Timedelta(seconds=2700),
+        'week_day': 4,
+        # 'day_of_month': 1,
+        'daily_hour': 8,
+        # 'minute': 45,
         'outcome': 0
     }
     # Assert the features of the enabling instant in the middle of the batch ready
@@ -184,14 +184,14 @@ def test__get_features():
         DEFAULT_CSV_IDS.activity: "C",
         DEFAULT_CSV_IDS.resource: "Jolyne",
         'instant': pd.Timestamp("2021-01-01T13:00:00+00:00"),
-        'num_queue': 3,
-        't_ready': pd.Timedelta(seconds=1800),
-        't_waiting': pd.Timedelta(hours=1, seconds=1800),
-        't_max_flow': pd.Timedelta(hours=5),
-        'day_of_week': 4,
-        'day_of_month': 1,
-        'hour_of_day': 13,
-        'minute': 00,
+        'batch_size': 3,
+        'batch_ready_wt': pd.Timedelta(seconds=1800),
+        'batch_max_wt': pd.Timedelta(hours=1, seconds=1800),
+        'max_cycle_time': pd.Timedelta(hours=5),
+        'week_day': 4,
+        # 'day_of_month': 1,
+        'daily_hour': 13,
+        # 'minute': 00,
         'outcome': 0
     }
     # Assert the features of the first enabling instant
@@ -211,13 +211,13 @@ def test__get_features():
         DEFAULT_CSV_IDS.activity: "F",
         DEFAULT_CSV_IDS.resource: "Joseph",
         'instant': pd.Timestamp("2021-01-01T16:30:00+00:00"),
-        'num_queue': 1,
-        't_ready': pd.Timedelta(0),
-        't_waiting': pd.Timedelta(0),
-        't_max_flow': pd.Timedelta(hours=8, seconds=1800),
-        'day_of_week': 4,
-        'day_of_month': 1,
-        'hour_of_day': 16,
-        'minute': 30,
+        'batch_size': 1,
+        'batch_ready_wt': pd.Timedelta(0),
+        'batch_max_wt': pd.Timedelta(0),
+        'max_cycle_time': pd.Timedelta(hours=8, seconds=1800),
+        'week_day': 4,
+        # 'day_of_month': 1,
+        'daily_hour': 16,
+        # 'minute': 30,
         'outcome': 0
     }

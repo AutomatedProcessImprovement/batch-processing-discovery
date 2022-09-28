@@ -76,9 +76,9 @@ def _compute_features_table(
     # Transform duration to seconds
     features_table = pd.DataFrame(data=features)
     features_table['instant'] = features_table['instant'].astype(np.int64) / 10 ** 9
-    features_table['t_ready'] = features_table['t_ready'].apply(lambda t: t.total_seconds())
-    features_table['t_waiting'] = features_table['t_waiting'].apply(lambda t: t.total_seconds())
-    features_table['t_max_flow'] = features_table['t_max_flow'].apply(lambda t: t.total_seconds())
+    features_table['batch_ready_wt'] = features_table['batch_ready_wt'].apply(lambda t: t.total_seconds())
+    features_table['batch_max_wt'] = features_table['batch_max_wt'].apply(lambda t: t.total_seconds())
+    features_table['max_cycle_time'] = features_table['max_cycle_time'].apply(lambda t: t.total_seconds())
     # Return table
     return features_table
 
@@ -105,15 +105,15 @@ def _get_features(
     batch_type = batch_instance[log_ids.batch_type].iloc[0]
     activity = batch_instance[log_ids.activity].iloc[0]
     resource = batch_instance[log_ids.resource].iloc[0]
-    num_queue = len(batch_instance)
-    t_ready = instant - batch_instance[log_ids.enabled_time].max()
-    t_waiting = instant - batch_instance[log_ids.enabled_time].min()
+    batch_size = len(batch_instance)
+    batch_ready_wt = instant - batch_instance[log_ids.enabled_time].max()
+    batch_max_wt = instant - batch_instance[log_ids.enabled_time].min()
     case_ids = batch_instance[log_ids.case].unique()
-    t_max_flow = (instant - event_log[event_log[log_ids.case].isin(case_ids)][log_ids.start_time].min())
-    day_of_week = instant.day_of_week
-    day_of_month = instant.day
-    hour_of_day = instant.hour
-    minute_of_day = instant.minute
+    max_cycle_time = (instant - event_log[event_log[log_ids.case].isin(case_ids)][log_ids.start_time].min())
+    week_day = instant.day_of_week
+    # day_of_month = instant.day
+    daily_hour = instant.hour
+    # minute_of_day = instant.minute
     # Return the features dict
     return {
         log_ids.batch_id: batch_id,
@@ -121,13 +121,13 @@ def _get_features(
         log_ids.activity: activity,
         log_ids.resource: resource,
         'instant': instant,
-        'num_queue': num_queue,
-        't_ready': t_ready,
-        't_waiting': t_waiting,
-        't_max_flow': t_max_flow,
-        'day_of_week': day_of_week,
-        'day_of_month': day_of_month,
-        'hour_of_day': hour_of_day,
-        'minute': minute_of_day,
+        'batch_size': batch_size,
+        'batch_ready_wt': batch_ready_wt,
+        'batch_max_wt': batch_max_wt,
+        'max_cycle_time': max_cycle_time,
+        'week_day': week_day,
+        # 'day_of_month': day_of_month,
+        'daily_hour': daily_hour,
+        # 'minute': minute_of_day,
         'outcome': outcome
     }
