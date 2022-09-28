@@ -8,6 +8,7 @@ from .config import EventLogIDs
 
 def _compute_features_table(
         event_log: pd.DataFrame,
+        batched_instances: pd.DataFrame,
         log_ids: EventLogIDs,
         num_batch_ready_negative_events: int = 2,
         num_batch_enabled_negative_events: int = 2
@@ -16,14 +17,13 @@ def _compute_features_table(
     Create a DataFrame with the features of the batch-related events, classifying them into events that activate the batch and events
     that does not activate the batch.
 
-    :param event_log:                           event log with the batch information already discovered.
+    :param event_log:                           full event log with the batch information already discovered.
+    :param batched_instances:                   batched activity instances to extract the features out of them.
     :param log_ids:                             mapping with the IDs of each column in the dataset.
     :param num_batch_ready_negative_events:     number of non-firing instants in between the batch enablement and firing.
     :param num_batch_enabled_negative_events:   number of non-firing instants from the enablement times of each case in the batch.
     :return: A Dataframe with the features of the events activating a batch.
     """
-    # Event log with events related to batches
-    batch_log = event_log[~pd.isna(event_log[log_ids.batch_id])]
     # Register firing feature for each single activity that is not executed as a batch?
     # - I was thinking of this option, but kinda discarded it. It could be good to also take as observations the firing of the
     #   batched activity as a single activity (not batched) if it is executed some times individually. In this way we could
@@ -36,7 +36,7 @@ def _compute_features_table(
     #   being activated. Thus, consider them without knowing if they were thought to be a batch could hinder the rules discovery.
     # Register features for each batch instance
     features = []
-    for (key, batch_instance) in batch_log.groupby([log_ids.batch_id]):
+    for (key, batch_instance) in batched_instances.groupby([log_ids.batch_id]):
         batch_instance_start = batch_instance[log_ids.start_time].min()
         # Get features of the instant activating the batch instance
         features += [

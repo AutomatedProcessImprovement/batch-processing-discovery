@@ -12,7 +12,11 @@ def test__compute_features_table():
     event_log[DEFAULT_CSV_IDS.end_time] = pd.to_datetime(event_log[DEFAULT_CSV_IDS.end_time], utc=True)
     event_log[DEFAULT_CSV_IDS.batch_id] = event_log[DEFAULT_CSV_IDS.batch_id].astype('Int64')
     # Compute features table
-    features_table = _compute_features_table(event_log, DEFAULT_CSV_IDS)
+    features_table = _compute_features_table(
+        event_log=event_log,
+        batched_instances=event_log[~pd.isna(event_log[DEFAULT_CSV_IDS.batch_id])],
+        log_ids=DEFAULT_CSV_IDS
+    )
     # Assert features
     # 1 positive observation per batch
     assert len(features_table[features_table['outcome'] == 1]) == 4

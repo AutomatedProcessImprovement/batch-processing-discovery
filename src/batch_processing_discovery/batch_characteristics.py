@@ -66,10 +66,8 @@ def discover_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs
     """
     # Prepare datasets based on the type
     if resource_aware:
-        to_drop = [log_ids.batch_id, log_ids.batch_type]
         keys = [log_ids.activity, log_ids.resource]
     else:
-        to_drop = [log_ids.batch_id, log_ids.batch_type, log_ids.resource]
         keys = [log_ids.activity]
     # Calculate features per batch
     batches = []
@@ -77,14 +75,17 @@ def discover_batch_characteristics(event_log: pd.DataFrame, log_ids: EventLogIDs
         batched_grouped_instances = grouped_instances[~pd.isna(grouped_instances[log_ids.batch_id])]
         # If the activity is executed as a batch any time
         if len(batched_grouped_instances) > 0:
-            # Get the features table of the instances in this group
-            features_table = _compute_features_table(grouped_instances, log_ids).drop(to_drop + keys, axis=1)
-            # Get the batch size distribution
+            # Get the batch size distribution and batch frequency
             size_distribution = _get_size_distribution(grouped_instances, log_ids)
-            # Get the batch frequency
             batch_frequency = (sum(size_distribution.values()) - size_distribution[1]) / sum(size_distribution.values())
             # Get the batch duration distribution
             duration_distribution = _get_duration_distribution(grouped_instances, log_ids)
+            # Get the features table of the instances in this group
+            features_table = _compute_features_table(
+                event_log=event_log,
+                batched_instances=batched_grouped_instances,
+                log_ids=log_ids
+            ).drop([log_ids.batch_id, log_ids.batch_type, log_ids.resource, log_ids.activity, 'instant'], axis=1)
             # Get the activation rules
             firing_rules = {}
             if len(features_table['outcome'].unique()) > 1:
