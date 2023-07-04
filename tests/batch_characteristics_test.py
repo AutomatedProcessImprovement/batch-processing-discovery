@@ -28,7 +28,7 @@ def test_discover_batch_processing_and_characteristics():
         'support': 1.0,
         'rules': [
             [
-                {'attribute': "batch_size", 'condition': "=", 'value': "3"}
+                {'attribute': "batch_size", 'comparison': "=", 'value': "3"}
             ]
         ]
     }
@@ -57,7 +57,7 @@ def test_discover_batch_characteristics():
         'support': 1.0,
         'rules': [
             [
-                {'attribute': "batch_size", 'condition': "=", 'value': "3"}
+                {'attribute': "batch_size", 'comparison': "=", 'value': "3"}
             ]
         ]
     }

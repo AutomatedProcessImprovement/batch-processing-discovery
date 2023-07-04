@@ -9,9 +9,10 @@ def _get_rules(
         max_rules: int = 3
 ) -> dict:
     """
-    Discover the rules that lead to the positive outcome in the observations passed as argument in [data]. In this function, the support
-    is measured only with positive outcome observations, instead of all observations. In this way, a rule with 50% support explains 50% of
-    positive outcome observations, and a rule with 100% explains all of them.
+    Discover the rules that lead to the positive outcome in the observations passed as argument in [data].
+    In this function, the support is measured only with positive outcome observations, instead of all
+    observations. In this way, a rule with 50% support explains 50% of positive outcome observations,
+    and a rule with 100% explains all of them.
 
     :param data:                pd.DataFrame with one observation per row.
     :param outcome              ID of the column with the variable to predict (1 positive, 0 negative).
@@ -107,7 +108,7 @@ def _parse_rules(model) -> list:
                     print("Error parsing interval '{}', couldn't find the separating character '-'.".format(condition.val))
                     operator = "null"
                     value = "null"
-            sublist += [{'attribute': condition.feature, 'condition': operator, 'value': value}]
+            sublist += [{'attribute': condition.feature, 'comparison': operator, 'value': value}]
         # Add sublist of rules to complete
         rules += [sublist]
     # Return the rules
