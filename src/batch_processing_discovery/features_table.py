@@ -78,7 +78,7 @@ def _compute_features_table(
     features_table['instant'] = features_table['instant'].astype(np.int64) / 10 ** 9
     features_table['batch_ready_wt'] = features_table['batch_ready_wt'].apply(lambda t: t.total_seconds())
     features_table['batch_max_wt'] = features_table['batch_max_wt'].apply(lambda t: t.total_seconds())
-    features_table['max_cycle_time'] = features_table['max_cycle_time'].apply(lambda t: t.total_seconds())
+    # features_table['max_cycle_time'] = features_table['max_cycle_time'].apply(lambda t: t.total_seconds())
     # Return table
     return features_table
 
@@ -109,7 +109,7 @@ def _get_features(
     batch_ready_wt = instant - batch_instance[log_ids.enabled_time].max()
     batch_max_wt = instant - batch_instance[log_ids.enabled_time].min()
     case_ids = batch_instance[log_ids.case].unique()
-    max_cycle_time = (instant - event_log[event_log[log_ids.case].isin(case_ids)][log_ids.start_time].min())
+    # max_cycle_time = (instant - event_log[event_log[log_ids.case].isin(case_ids)][log_ids.start_time].min())
     week_day = instant.day_of_week
     # day_of_month = instant.day
     daily_hour = instant.hour
@@ -124,7 +124,7 @@ def _get_features(
         'batch_size': batch_size,
         'batch_ready_wt': batch_ready_wt,
         'batch_max_wt': batch_max_wt,
-        'max_cycle_time': max_cycle_time,
+        # 'max_cycle_time': max_cycle_time,
         'week_day': week_day,
         # 'day_of_month': day_of_month,
         'daily_hour': daily_hour,
