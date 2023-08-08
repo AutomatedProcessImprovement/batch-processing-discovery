@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "batch-processing-discovery"
-version = "0.4.4"
+version = "0.4.5"
 description = "Python algorithm to discover, from an event log, activity instances that are executed in a batch."
 authors = ["David Chapela de la Campa <david.chapela.delacampa@gmail.com>"]
 readme = "README.md"
