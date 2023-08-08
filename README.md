@@ -1,3 +1,7 @@
+🚨 This repository is now a subpackage of `pix-framework.discovery`, https://github.com/AutomatedProcessImprovement/pix-framework/tree/main/src/pix_framework/discovery/batch_processing_discovery.
+
+---
+
 # Batch Processing Discovery
 
 ![ci](https://github.com/AutomatedProcessImprovement/batch-processing-discovery/actions/workflows/build.yaml/badge.svg)
